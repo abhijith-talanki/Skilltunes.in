@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ModuleMind — AI-Powered SAP FICO Learning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── Tokens ─────────────────────────────────────────────────── */
+    :root {
+      --bg:          #0A0E1A;
+      --surface:     #141929;
+      --surface-2:   #1A2035;
+      --border:      #1E2640;
+      --purple:      #7C3AED;
+      --purple-l:    #A78BFA;
+      --purple-dim:  #1E1035;
+      --purple-glow: rgba(124,58,237,0.25);
+      --green:       #10B981;
+      --green-dim:   rgba(16,185,129,0.12);
+      --amber:       #F59E0B;
+      --text:        #E2E8F0;
+      --sub:         #94A3B8;
+      --dim:         #475569;
+      --white:       #FFFFFF;
+      --font-display: 'Space Grotesk', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+      --r:            14px;
+    }
+
+    /* ── Reset ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-display);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ── Utility ─────────────────────────────────────────────────── */
+    .mono { font-family: var(--font-mono); }
+    .tag-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--purple-dim); border: 1px solid var(--border);
+      border-radius: 20px; padding: 5px 14px;
+      font-size: 12px; font-weight: 600; color: var(--purple-l);
+      letter-spacing: 0.04em;
+    }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+      color: var(--purple-l); text-transform: uppercase; margin-bottom: 12px;
+    }
+    .soon-badge {
+      display: inline-block; background: rgba(245,158,11,0.14); color: #F59E0B;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+    }
+
+    /* ── Nav ─────────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw; height: 64px;
+      border-bottom: 1px solid transparent;
+      transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+    }
+    nav.scrolled {
+      background: rgba(10,14,26,0.85);
+      backdrop-filter: blur(16px);
+      border-color: var(--border);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 18px; font-weight: 800; color: var(--white);
+    }
+    .nav-logo-icon {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: var(--purple);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 800; color: white;
+      box-shadow: 0 0 16px var(--purple-glow);
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px; font-weight: 500; color: var(--sub);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--purple); color: var(--white);
+      padding: 9px 22px; border-radius: 9px;
+      font-size: 14px; font-weight: 700;
+      box-shadow: 0 4px 20px var(--purple-glow);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.9; transform: translateY(-1px); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--text); border-radius: 2px; }
+
+    /* ── Hero ─────────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; gap: 60px;
+      padding: 120px 5vw 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 50%, rgba(124,58,237,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 10% 80%, rgba(16,185,129,0.05) 0%, transparent 60%);
+    }
+    .hero-grid-overlay {
+      position: absolute; inset: 0; pointer-events: none; opacity: 0.04;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .hero-left { position: relative; z-index: 1; }
+    .hero-eyebrow { margin-bottom: 20px; }
+    .hero-headline {
+      font-size: clamp(36px, 5vw, 62px);
+      font-weight: 800; line-height: 1.08; letter-spacing: -0.02em;
+      color: var(--white); margin-bottom: 22px;
+    }
+    .hero-headline em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--purple-l), var(--green));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 17px; color: var(--sub); line-height: 1.7;
+      max-width: 480px; margin-bottom: 22px;
+    }
+    .hero-facts { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
+    .hero-facts .mono {
+      color: var(--purple-l); font-size: 12px; font-weight: 600;
+      background: var(--purple-dim); border: 1px solid var(--border);
+      padding: 5px 12px; border-radius: 20px;
+    }
+    .hero-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--purple); color: var(--white);
+      padding: 14px 28px; border-radius: 11px;
+      font-size: 15px; font-weight: 700;
+      box-shadow: 0 6px 24px var(--purple-glow);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 32px var(--purple-glow); }
+    .btn-ghost {
+      background: transparent; color: var(--sub);
+      padding: 14px 22px; border-radius: 11px;
+      font-size: 15px; font-weight: 600;
+      border: 1px solid var(--border);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-ghost:hover { color: var(--text); border-color: var(--purple-l); }
+    .hero-trust {
+      margin-top: 36px; display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: var(--sub);
+    }
+    .hero-trust-dots { display: flex; }
+    .hero-trust-dots span {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 2px solid var(--bg);
+      background: var(--surface-2); font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin-left: -8px;
+    }
+
+    /* ── Interview Widget ─────────────────────────────────────────── */
+    .hero-right { position: relative; z-index: 1; }
+    .widget-wrap {
+      background: #FFFFFF; border-radius: 20px;
+      border: 1px solid rgba(124,58,237,0.2);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,58,237,0.1);
+      overflow: hidden;
+    }
+    .widget-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; border-bottom: 1px solid rgba(0,0,0,0.06);
+      background: #FAFAFA;
+    }
+    .widget-dots { display: flex; gap: 7px; }
+    .widget-dots i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+    .dot-red { background: #EF4444; }
+    .dot-yellow { background: #F59E0B; }
+    .dot-green { background: #10B981; }
+    .widget-title { font-size: 12px; font-weight: 600; color: #64748B; }
+    .widget-badge {
+      font-size: 11px; font-weight: 600; color: #065F46;
+      background: #D1FAE5; padding: 3px 10px; border-radius: 20px;
+    }
+    .widget-body { padding: 22px; }
+
+    /* Status pill inside widget */
+    .w-status {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid; border-radius: 20px;
+      padding: 5px 14px; margin-bottom: 20px;
+      font-size: 12px; font-weight: 600;
+      transition: all 0.4s;
+    }
+    .w-status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      transition: background 0.4s;
+    }
+
+    /* Orb */
+    .w-orb-wrap { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; gap: 16px; }
+    .w-orb {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--purple-dim); border: 2px solid var(--purple);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; flex-shrink: 0;
+      box-shadow: 0 0 24px var(--purple-glow);
+      transition: border-color 0.4s, box-shadow 0.4s;
+    }
+    .w-waves { display: flex; align-items: center; gap: 5px; height: 36px; }
+    .w-wave {
+      width: 4px; border-radius: 3px; background: var(--green);
+      animation: waveUp 0.7s ease-in-out infinite;
+      transform-origin: bottom;
+    }
+    .w-wave:nth-child(1) { animation-delay: 0s;    height: 16px; }
+    .w-wave:nth-child(2) { animation-delay: 0.1s;  height: 28px; }
+    .w-wave:nth-child(3) { animation-delay: 0.2s;  height: 36px; background: var(--purple-l); }
+    .w-wave:nth-child(4) { animation-delay: 0.1s;  height: 28px; }
+    .w-wave:nth-child(5) { animation-delay: 0s;    height: 16px; }
+    @keyframes waveUp {
+      0%, 100% { transform: scaleY(0.3); }
+      50%       { transform: scaleY(1); }
+    }
+
+    /* Question + transcript cards */
+    .w-question {
+      background: #F5F3FF; border-radius: 11px;
+      border: 1px solid rgba(124,58,237,0.15); padding: 14px 16px; margin-bottom: 12px;
+    }
+    .w-question-label { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; color: var(--purple); margin-bottom: 8px; }
+    .w-question-text { font-size: 13px; color: #0A0E1A; line-height: 1.6; min-height: 44px; }
+    .w-transcript {
+      background: #F0FDF4; border-radius: 11px;
+      border: 1px solid rgba(16,185,129,0.3); padding: 14px 16px;
+      display: none;
+    }
+    .w-transcript-label { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; color: var(--green); margin-bottom: 8px; }
+    .w-transcript-text { font-size: 13px; color: #0A0E1A; line-height: 1.6; }
+
+    /* Timer bar */
+    .w-timer-wrap { margin-top: 14px; }
+    .w-timer-label { display: flex; justify-content: space-between; font-size: 11px; color: #64748B; margin-bottom: 6px; }
+    .w-timer-bar { height: 4px; background: #E2E8F0; border-radius: 2px; overflow: hidden; }
+    .w-timer-fill { height: 100%; border-radius: 2px; background: var(--purple); width: 0%; transition: width 0.1s; }
+
+    /* ── Stats band ───────────────────────────────────────────────── */
+    #stats {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 5vw;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-size: 42px; font-weight: 800; color: var(--white);
+      line-height: 1; margin-bottom: 6px;
+    }
+    .stat-num span { color: var(--purple-l); }
+    .stat-label { font-size: 13px; color: var(--sub); }
+    .stat-note { font-size: 10px; color: var(--dim); margin-top: 10px; text-align: center; grid-column: 1 / -1; }
+
+    /* ── Section shared ───────────────────────────────────────────── */
+    .section {
+      padding: 100px 5vw;
+    }
+    .section-header { text-align: center; margin-bottom: 60px; }
+    .section-header h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800; color: var(--white); line-height: 1.15;
+      margin-bottom: 14px;
+    }
+    .section-header p { font-size: 16px; color: var(--sub); max-width: 560px; margin: 0 auto; }
+
+    /* ── Features ─────────────────────────────────────────────────── */
+    #features { background: var(--surface); }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feature-card {
+      background: #FFFFFF; border-radius: var(--r);
+      border: 1px solid rgba(124,58,237,0.15); padding: 32px;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    }
+    .feature-card:hover { border-color: var(--purple); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(124,58,237,0.2); }
+    .feature-icon {
+      width: 52px; height: 52px; border-radius: 13px;
+      background: var(--purple-dim); border: 1px solid rgba(124,58,237,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 20px;
+    }
+    .feature-card h3 { font-size: 18px; font-weight: 700; color: #0A0E1A; margin-bottom: 10px; }
+    .feature-card p { font-size: 14px; color: #475569; line-height: 1.7; }
+    .feature-tcodes {
+      margin-top: 16px; display: flex; flex-wrap: wrap; gap: 7px;
+    }
+    .tcode {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      color: var(--purple); background: #F5F3FF;
+      border: 1px solid rgba(124,58,237,0.25);
+      padding: 3px 9px; border-radius: 5px;
+    }
+
+    /* ── Module coverage ─────────────────────────────────────────── */
+    #modules { position: relative; overflow: hidden; }
+    .constellation-wrap {
+      position: relative; width: 360px; height: 360px;
+      margin: 0 auto 60px; flex-shrink: 0;
+    }
+    .erp-hub {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 106px; height: 106px; border-radius: 50%;
+      background: var(--purple-dim);
+      border: 2px solid var(--purple);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 40px var(--purple-glow);
+      z-index: 2;
+    }
+    .erp-hub-text { font-family: var(--font-display); font-size: 14px; font-weight: 800; color: var(--white); text-align: center; line-height: 1.25; letter-spacing: -0.01em; }
+    .erp-hub-text span { display: block; color: var(--purple-l); }
+    .orbit {
+      position: absolute; top: 50%; left: 50%;
+      width: 280px; height: 280px;
+      margin: -140px 0 0 -140px;
+      border: 1px dashed rgba(124,58,237,0.2); border-radius: 50%;
+      animation: spin 32s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .module-node {
+      position: absolute; top: 50%; left: 50%;
+      transform-origin: center;
+      z-index: 1;
+    }
+    .module-pill {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+      padding: 7px 13px; border-radius: 8px;
+      border: 1px solid; white-space: nowrap;
+      animation: nodeBreath 3s ease-in-out infinite;
+      transform: translate(-50%, -50%);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .module-pill.soon { animation: none; opacity: 0.55; border-style: dashed; }
+    .pill-soon-dot {
+      width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+      opacity: 0.7;
+    }
+    @keyframes nodeBreath {
+      0%, 100% { box-shadow: 0 0 0 rgba(0,0,0,0); }
+      50%       { box-shadow: 0 0 12px currentColor; }
+    }
+
+    /* node positions (angle from center, r=140px, 3 modules at 120°) */
+    .node-fico { transform: translate(-50%, calc(-50% - 140px)); }
+    .node-mm   { transform: translate(calc(-50% + 121px), calc(-50% + 70px)); }
+    .node-sd   { transform: translate(calc(-50% - 121px), calc(-50% + 70px)); }
+
+    .pill-fico { color: #A78BFA; border-color: rgba(167,139,250,0.5); background: rgba(167,139,250,0.1); animation-delay: 0s; }
+    .pill-mm   { color: #F472B6; border-color: rgba(244,114,182,0.35); background: rgba(244,114,182,0.06); }
+    .pill-sd   { color: #60A5FA; border-color: rgba(96,165,250,0.35);  background: rgba(96,165,250,0.06); }
+
+    .modules-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; margin-top: 0;
+    }
+    .module-card {
+      background: #FFFFFF; border: 1px solid rgba(124,58,237,0.12);
+      border-radius: var(--r); padding: 22px;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.16);
+      position: relative;
+    }
+    .module-card:hover { border-color: var(--purple); transform: translateY(-3px); box-shadow: 0 10px 32px rgba(124,58,237,0.18); }
+    .module-card.dim { opacity: 0.72; }
+    .module-card-code {
+      font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+      margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .module-card h4 { font-size: 15px; font-weight: 700; color: #0A0E1A; margin-bottom: 6px; }
+    .module-card p { font-size: 13px; color: #475569; line-height: 1.6; }
+    .module-card-topics {
+      margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .topic-tag {
+      font-size: 11px; color: #475569; background: #F5F3FF;
+      border: 1px solid rgba(124,58,237,0.15); padding: 2px 9px; border-radius: 4px;
+    }
+
+    /* ── Interview spotlight ──────────────────────────────────────── */
+    #interview-spotlight {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .spotlight-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; gap: 80px;
+    }
+    .spotlight-left h2 {
+      font-size: clamp(26px, 3.5vw, 40px);
+      font-weight: 800; color: var(--white); line-height: 1.15; margin-bottom: 18px;
+    }
+    .spotlight-left p { font-size: 15px; color: var(--sub); line-height: 1.75; margin-bottom: 28px; }
+    .loop-steps { display: flex; flex-direction: column; gap: 16px; }
+    .loop-step {
+      display: flex; align-items: flex-start; gap: 16px;
+    }
+    .loop-step-icon {
+      width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .loop-step-body h4 { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 3px; }
+    .loop-step-body p  { font-size: 13px; color: var(--sub); line-height: 1.6; }
+
+    .spotlight-right { position: relative; }
+    .flow-card {
+      background: #FFFFFF; border-radius: 16px;
+      border: 1px solid rgba(124,58,237,0.15); padding: 24px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    }
+    .flow-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.06);
+      font-size: 13px;
+    }
+    .flow-row:last-child { border-bottom: none; }
+    .flow-icon { font-size: 18px; width: 28px; text-align: center; }
+    .flow-content { flex: 1; }
+    .flow-content strong { color: #0A0E1A; display: block; margin-bottom: 2px; }
+    .flow-content span { color: #64748B; font-size: 12px; }
+    .flow-badge {
+      font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 20px;
+    }
+    .badge-purple { background: var(--purple-dim); color: var(--purple-l); }
+    .badge-green  { background: var(--green-dim);  color: var(--green); }
+    .badge-amber  { background: rgba(146,64,14,0.1); color: #92400E; }
+    .badge-red    { background: rgba(239,68,68,0.12);  color: #EF4444; }
+
+    /* ── How it works ─────────────────────────────────────────────── */
+    .how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    .how-card {
+      background: #FFFFFF; border-radius: var(--r);
+      border: 1px solid rgba(124,58,237,0.12); padding: 32px;
+      position: relative;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.16);
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .how-card:hover { border-color: var(--purple); transform: translateY(-4px); box-shadow: 0 12px 36px rgba(124,58,237,0.18); }
+    .how-step {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+      color: var(--purple);
+      letter-spacing: 0.08em; margin-bottom: 16px;
+    }
+    .how-card h3 { font-size: 18px; font-weight: 700; color: #0A0E1A; margin-bottom: 10px; }
+    .how-card p  { font-size: 14px; color: #475569; line-height: 1.7; }
+    .how-connector {
+      position: absolute; right: -20px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--purple-l); font-size: 20px; z-index: 1;
+    }
+
+    /* ── Pricing ──────────────────────────────────────────────────── */
+    #pricing { background: var(--surface); }
+    .pricing-toggle {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin: 24px auto 0; width: fit-content;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px;
+    }
+    .pricing-toggle button {
+      font-size: 13px; font-weight: 600; color: var(--sub);
+      padding: 7px 18px; border-radius: 16px; transition: background 0.2s, color 0.2s;
+    }
+    .pricing-toggle button.active { background: var(--purple); color: white; }
+    .pricing-trial-note { text-align: center; font-size: 13px; color: var(--sub); margin: 18px 0 44px; }
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 20px; align-items: stretch;
+    }
+    .pricing-card {
+      background: #FFFFFF; border-radius: 18px;
+      border: 1px solid rgba(124,58,237,0.12); padding: 32px 26px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.16);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(124,58,237,0.2); }
+    .pricing-card.featured {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 1px var(--purple), 0 24px 48px var(--purple-glow);
+      position: relative;
+    }
+    .pricing-badge {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      background: var(--purple); color: white;
+      font-size: 11px; font-weight: 700; padding: 4px 16px; border-radius: 20px;
+      white-space: nowrap;
+    }
+    .pricing-tier { font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; }
+    .pricing-price {
+      font-size: 36px; font-weight: 800; color: #0A0E1A;
+      line-height: 1; margin-bottom: 4px;
+    }
+    .pricing-price sup { font-size: 18px; vertical-align: super; color: var(--purple); }
+    .pricing-price sub { font-size: 13px; font-weight: 500; color: #475569; }
+    .pricing-strike { font-size: 13px; color: #94A3B8; text-decoration: line-through; margin-bottom: 4px; }
+    .pricing-desc { font-size: 13px; color: #475569; margin-bottom: 24px; }
+    .pricing-features { list-style: none; flex: 1; margin-bottom: 24px; }
+    .pricing-features li {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 13px; color: #1E293B; padding: 7px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .pricing-features li:last-child { border-bottom: none; }
+    .pricing-features li::before { content: '✓'; color: #166534; font-weight: 700; flex-shrink: 0; }
+    .pricing-features li.off { color: #64748B; }
+    .pricing-features li.off::before { content: '–'; color: #64748B; }
+    .pricing-btn {
+      width: 100%; padding: 13px; border-radius: 10px;
+      font-size: 15px; font-weight: 700;
+      text-align: center; display: block;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .pricing-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-outline { border: 1.5px solid var(--border); color: #0A0E1A; background: transparent; }
+    .btn-filled { background: var(--purple); color: white; }
+    .pricing-loading { text-align: center; color: var(--sub); font-size: 13px; padding: 20px; grid-column: 1 / -1; }
+
+    /* ── CTA ──────────────────────────────────────────────────────── */
+    #cta {
+      padding: 120px 5vw;
+      text-align: center;
+      background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(124,58,237,0.1) 0%, transparent 70%);
+    }
+    #cta h2 {
+      font-size: clamp(30px, 4.5vw, 52px);
+      font-weight: 800; color: var(--white); margin-bottom: 18px; line-height: 1.1;
+    }
+    #cta p { font-size: 17px; color: var(--sub); margin-bottom: 36px; }
+    .cta-input-wrap {
+      display: flex; gap: 12px; max-width: 460px; margin: 0 auto 16px;
+    }
+    .cta-input {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 13px 18px; font-size: 15px;
+      color: var(--text); font-family: var(--font-display);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .cta-input:focus { border-color: var(--purple-l); }
+    .cta-input::placeholder { color: var(--sub); }
+    .cta-note { font-size: 12px; color: var(--sub); }
+
+    /* ── Footer ───────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 48px 5vw 36px;
+    }
+    .footer-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 48px; margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+    .footer-brand { max-width: 260px; }
+    .footer-brand p { font-size: 13px; color: var(--sub); line-height: 1.7; margin-top: 12px; }
+    .footer-cols { display: flex; gap: 64px; flex-wrap: wrap; }
+    .footer-col h5 { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col li a { font-size: 13px; color: var(--sub); transition: color 0.2s; }
+    .footer-col li a:hover { color: var(--text); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+      font-size: 12px; color: var(--sub);
+    }
+
+    /* ── Reveal animation ────────────────────────────────────────── */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s, transform 0.6s; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media (max-width: 960px) {
+      #hero { grid-template-columns: 1fr; padding-top: 100px; text-align: center; }
+      .hero-left { order: 1; }
+      .hero-right { order: 2; }
+      .hero-sub { max-width: 100%; margin-left:auto; margin-right:auto; }
+      .hero-facts { justify-content: center; }
+      .hero-actions { justify-content: center; }
+      .hero-trust { justify-content: center; }
+      .spotlight-inner { grid-template-columns: 1fr; gap: 40px; }
+      .features-grid, .modules-grid, .how-grid { grid-template-columns: 1fr 1fr; }
+      #stats { grid-template-columns: repeat(2, 1fr); }
+      .how-connector { display: none; }
+    }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .features-grid, .modules-grid, .how-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      #stats { grid-template-columns: repeat(2, 1fr); }
+      .footer-cols { gap: 36px; }
+      .cta-input-wrap { flex-direction: column; }
+      .constellation-wrap { width: 280px; height: 280px; }
+      .orbit { width: 210px; height: 210px; margin: -105px 0 0 -105px; }
+      .node-fico { transform: translate(-50%, calc(-50% - 105px)); }
+      .node-mm   { transform: translate(calc(-50% + 91px), calc(-50% + 52px)); }
+      .node-sd   { transform: translate(calc(-50% - 91px), calc(-50% + 52px)); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ──────────────────────────────────────────────────────────────── -->
+<nav id="navbar">
+  <a class="nav-logo" href="/" style="text-decoration:none;color:inherit;">
+    <div class="nav-logo-icon">M</div>
+    ModuleMind
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#modules">Coverage</a></li>
+    <li><a href="#interview-spotlight">Interview AI</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">Get Early Access</a>
+  <div class="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-overlay"></div>
+
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <span class="tag-pill">🎓 Built for SAP FICO Consultants</span>
+    </div>
+    <h1 class="hero-headline">
+      SAP FICO.<br>
+      Learn it. Speak it.<br>
+      <em>Land it.</em>
+    </h1>
+    <p class="hero-sub">
+      AI-powered mock interviews, adaptive quizzes, and a guided FICO curriculum —
+      built to get you genuinely interview-ready, not just quiz-good.
+    </p>
+    <div class="hero-facts">
+      <span class="mono">1,300+ questions</span>
+      <span class="mono">17 core topics</span>
+      <span class="mono">49 T-codes</span>
+    </div>
+    <div class="hero-actions">
+      <a href="#cta" class="btn-primary">Get Early Access →</a>
+      <a href="#interview-spotlight" class="btn-ghost">See the Interview AI</a>
+    </div>
+    <div class="hero-trust">
+      <div class="hero-trust-dots">
+        <span>🧑</span><span>👩</span><span>👨</span><span>🧑</span>
+      </div>
+      Built for aspiring &amp; practicing SAP FICO consultants
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="widget-wrap">
+      <div class="widget-topbar">
+        <div class="widget-dots">
+          <i class="dot-red"></i>
+          <i class="dot-yellow"></i>
+          <i class="dot-green"></i>
+        </div>
+        <span class="widget-title">AI Mock Interview</span>
+        <span class="widget-badge" id="wLive">● DEMO</span>
+      </div>
+      <div class="widget-body">
+        <!-- Status -->
+        <div class="w-status" id="wStatus" style="color: var(--purple-l); border-color: rgba(167,139,250,0.4);">
+          <div class="w-status-dot" id="wStatusDot" style="background: var(--purple-l);"></div>
+          <span id="wStatusText">Interviewer speaking...</span>
+        </div>
+
+        <!-- Orb + waves -->
+        <div class="w-orb-wrap">
+          <div class="w-orb" id="wOrb">🔊</div>
+          <div class="w-waves" id="wWaves" style="display:none;">
+            <div class="w-wave"></div>
+            <div class="w-wave"></div>
+            <div class="w-wave"></div>
+            <div class="w-wave"></div>
+            <div class="w-wave"></div>
+          </div>
+        </div>
+
+        <!-- Question -->
+        <div class="w-question">
+          <div class="w-question-label">INTERVIEWER</div>
+          <div class="w-question-text" id="wQuestion"></div>
+        </div>
+
+        <!-- Transcript (hidden initially) -->
+        <div class="w-transcript" id="wTranscript">
+          <div class="w-transcript-label">YOUR ANSWER</div>
+          <div class="w-transcript-text" id="wTranscriptText"></div>
+        </div>
+
+        <!-- Timer -->
+        <div class="w-timer-wrap" id="wTimerWrap" style="display:none;">
+          <div class="w-timer-label">
+            <span>Recording</span>
+            <span id="wTimerSec">0s / 10s min</span>
+          </div>
+          <div class="w-timer-bar">
+            <div class="w-timer-fill" id="wTimerFill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── STATS ─────────────────────────────────────────────────────────────── -->
+<section id="stats">
+  <div class="stat-item reveal">
+    <div class="stat-num">1,300<span>+</span></div>
+    <div class="stat-label">Quiz &amp; Interview Questions</div>
+  </div>
+  <div class="stat-item reveal">
+    <div class="stat-num">17</div>
+    <div class="stat-label">Core FICO Topics</div>
+  </div>
+  <div class="stat-item reveal">
+    <div class="stat-num">49</div>
+    <div class="stat-label">Real SAP T-Codes</div>
+  </div>
+  <div class="stat-item reveal">
+    <div class="stat-num">100<span>%</span></div>
+    <div class="stat-label">Free to Start</div>
+  </div>
+</section>
+
+<!-- ─── FEATURES ──────────────────────────────────────────────────────────── -->
+<section id="features" class="section">
+  <div class="section-header reveal">
+    <div class="section-label">What's inside</div>
+    <h2>Everything you need to go from learner to consultant</h2>
+    <p>Three tools that work together — study a guided curriculum, drill with adaptive quizzes, and get grilled on real SAP scenarios out loud.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon">🎙</div>
+      <h3>AI Mock Interviews</h3>
+      <p>Hands-free, conversational practice. Your AI interviewer speaks the question aloud, the mic opens automatically, and you answer out loud — every answer is scored against a model answer so you know exactly what you missed.</p>
+      <div class="feature-tcodes">
+        <span class="tcode">Voice in/out</span>
+        <span class="tcode">Auto-loop</span>
+        <span class="tcode">0-100 scoring</span>
+      </div>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">📚</div>
+      <h3>Adaptive Quiz Engine</h3>
+      <p>Practice mode leans into your weak spots; Consultant mode gives you a balanced mock exam once you've built up a topic. Covers real T-codes with a full explanation after every answer.</p>
+      <div class="feature-tcodes">
+        <span class="tcode">F-02</span>
+        <span class="tcode">F110</span>
+        <span class="tcode">FS00</span>
+        <span class="tcode">KSB1</span>
+      </div>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🗺️</div>
+      <h3>Learning Roadmap</h3>
+      <p>A guided path from S/4HANA fundamentals through Core FI, Controlling, and Period-End reporting — 17 topics across 4 phases, with live mastery scoring so you always know what to study next.</p>
+      <div class="feature-tcodes">
+        <span class="tcode">Foundations</span>
+        <span class="tcode">Core FI</span>
+        <span class="tcode">Controlling</span>
+        <span class="tcode">Reporting</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MODULES / COVERAGE ────────────────────────────────────────────────── -->
+<section id="modules" class="section">
+  <div class="section-header reveal">
+    <div class="section-label">Coverage</div>
+    <h2>One AI mind. Every SAP module, over time.</h2>
+    <p>ModuleMind goes all-in on FICO first — Materials Management and Sales &amp; Distribution are next on the roadmap, same app, same account.</p>
+  </div>
+
+  <div class="constellation-wrap reveal">
+    <div class="orbit"></div>
+    <div class="module-node node-fico"><span class="module-pill pill-fico">FICO</span></div>
+    <div class="module-node node-mm"><span class="module-pill pill-mm soon"><span class="pill-soon-dot"></span>MM</span></div>
+    <div class="module-node node-sd"><span class="module-pill pill-sd soon"><span class="pill-soon-dot"></span>SD</span></div>
+    <div class="erp-hub">
+      <span class="erp-hub-text">Module<span>Mind</span></span>
+    </div>
+  </div>
+
+  <div class="modules-grid">
+    <div class="module-card reveal">
+      <div class="module-card-code" style="color:#A78BFA;">FICO — Financial Accounting &amp; Controlling</div>
+      <h4>Live today, full depth</h4>
+      <p>17 topics across 4 phases — General Ledger, Accounts Payable, Accounts Receivable, Asset Accounting, Bank &amp; Tax Accounting, Cost &amp; Profit Center Accounting, Internal Orders, Product Costing, Profitability Analysis, and Period-End reporting.</p>
+      <div class="module-card-topics">
+        <span class="topic-tag">General Ledger</span>
+        <span class="topic-tag">Accounts Payable</span>
+        <span class="topic-tag">Accounts Receivable</span>
+        <span class="topic-tag">Asset Accounting</span>
+        <span class="topic-tag">Cost Center Accounting</span>
+        <span class="topic-tag">Profitability Analysis</span>
+      </div>
+    </div>
+    <div class="module-card dim reveal">
+      <div class="module-card-code" style="color:#F472B6;">MM — Materials Management <span class="soon-badge">Coming soon</span></div>
+      <h4>Procure-to-pay</h4>
+      <p>Purchase orders, GR/IR accounts, invoice verification, and how MM posts flow into FI — content is being built next.</p>
+    </div>
+    <div class="module-card dim reveal">
+      <div class="module-card-code" style="color:#60A5FA;">SD — Sales &amp; Distribution <span class="soon-badge">Coming soon</span></div>
+      <h4>Order-to-cash</h4>
+      <p>Sales orders, billing, pricing conditions, and the SD-FI integration points — on the roadmap after MM.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── INTERVIEW SPOTLIGHT ───────────────────────────────────────────────── -->
+<section id="interview-spotlight" class="section">
+  <div class="spotlight-inner">
+    <div class="spotlight-left reveal">
+      <div class="section-label">Interview AI</div>
+      <h2>The SAP interview practice<br>that actually talks back.</h2>
+      <p>
+        No scripted flashcards. No typing answers into a box. ModuleMind's AI interviewer
+        speaks aloud, waits for your real voice, and grades what you actually said —
+        closer to a real panel interview than a quiz.
+      </p>
+      <div class="loop-steps">
+        <div class="loop-step">
+          <div class="loop-step-icon" style="background:var(--purple-dim);border:1px solid rgba(124,58,237,0.3);">🔊</div>
+          <div class="loop-step-body">
+            <h4>Question speaks to you</h4>
+            <p>One of six named interviewer personas asks — voice matched to their gender.</p>
+          </div>
+        </div>
+        <div class="loop-step">
+          <div class="loop-step-icon" style="background:var(--green-dim);border:1px solid rgba(16,185,129,0.3);">🎙</div>
+          <div class="loop-step-body">
+            <h4>Mic opens automatically</h4>
+            <p>300 ms after the question ends — no button to press, no tap to start. Just answer.</p>
+          </div>
+        </div>
+        <div class="loop-step">
+          <div class="loop-step-icon" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);">⏱</div>
+          <div class="loop-step-body">
+            <h4>Short answers are flagged</h4>
+            <p>Under 10 seconds triggers a gentle "too short — want to try again?" and the mic reopens.</p>
+          </div>
+        </div>
+        <div class="loop-step">
+          <div class="loop-step-icon" style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);">🔄</div>
+          <div class="loop-step-body">
+            <h4>Loop continues automatically</h4>
+            <p>Your answer is scored for topic coverage, then the next question comes from the same curated bank — with real follow-ups, so it still feels like a conversation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spotlight-right reveal">
+      <div class="flow-card">
+        <div class="flow-row">
+          <div class="flow-icon">🔊</div>
+          <div class="flow-content">
+            <strong>AI speaks question aloud</strong>
+            <span>On-device text-to-speech, persona-matched voice</span>
+          </div>
+          <span class="flow-badge badge-purple">TTS</span>
+        </div>
+        <div class="flow-row">
+          <div class="flow-icon">⏳</div>
+          <div class="flow-content">
+            <strong>300 ms echo guard</strong>
+            <span>Prevents mic capturing speaker audio</span>
+          </div>
+          <span class="flow-badge badge-amber">Buffer</span>
+        </div>
+        <div class="flow-row">
+          <div class="flow-icon">🎙</div>
+          <div class="flow-content">
+            <strong>Mic opens — you speak</strong>
+            <span>Live transcription while you answer</span>
+          </div>
+          <span class="flow-badge badge-green">STT</span>
+        </div>
+        <div class="flow-row">
+          <div class="flow-icon">⏱</div>
+          <div class="flow-content">
+            <strong>Duration check</strong>
+            <span>Under 10 s → retry prompt → mic reopens</span>
+          </div>
+          <span class="flow-badge badge-red">&lt; 10 s</span>
+        </div>
+        <div class="flow-row">
+          <div class="flow-icon">🧠</div>
+          <div class="flow-content">
+            <strong>AI scores your answer</strong>
+            <span>0–100 coverage vs. the model answer</span>
+          </div>
+          <span class="flow-badge badge-purple">AI</span>
+        </div>
+        <div class="flow-row" style="border-bottom:none;">
+          <div class="flow-icon">🔄</div>
+          <div class="flow-content">
+            <strong>Loop repeats</strong>
+            <span>Continuous until you end the session</span>
+          </div>
+          <span class="flow-badge badge-green">Auto</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ──────────────────────────────────────────────────────── -->
+<section class="section" style="background: var(--surface);">
+  <div class="section-header reveal">
+    <div class="section-label">Getting started</div>
+    <h2>Three steps from first login to interview-ready</h2>
+  </div>
+  <div class="how-grid">
+    <div class="how-card reveal" style="position:relative;">
+      <div class="how-step">STEP 01</div>
+      <h3>Pick your topic</h3>
+      <p>17 topics across Foundations, Core FI, Controlling, and Reporting — each with its own quiz bank, T-code library, and interview questions.</p>
+      <div class="how-connector">→</div>
+    </div>
+    <div class="how-card reveal" style="position:relative;">
+      <div class="how-step">STEP 02</div>
+      <h3>Practice your way</h3>
+      <p>Run an adaptive quiz to test your knowledge, browse the T-code &amp; Q&amp;A library, or jump into an AI mock interview to test how you sound under pressure.</p>
+      <div class="how-connector">→</div>
+    </div>
+    <div class="how-card reveal">
+      <div class="how-step">STEP 03</div>
+      <h3>Track your gaps</h3>
+      <p>Your Learning Roadmap and Insights dashboard show exactly which topics need more time — so every session is targeted, not random.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRICING ───────────────────────────────────────────────────────────── -->
+<section id="pricing" class="section">
+  <div class="section-header reveal">
+    <div class="section-label">Pricing</div>
+    <h2>Start free. Upgrade when you're serious.</h2>
+    <p>No credit card required to begin. Upgrade for unlimited quizzes and full AI Mock Interview access.</p>
+  </div>
+  <div class="pricing-toggle reveal" id="currencyToggle">
+    <button data-cur="INR" id="curBtnINR">₹ INR</button>
+    <button data-cur="USD" id="curBtnUSD">$ USD</button>
+  </div>
+  <p class="pricing-trial-note reveal">New accounts get a 10-day free trial of AI Mock Interviews before you subscribe.</p>
+  <div class="pricing-grid" id="pricingGrid">
+    <div class="pricing-card reveal">
+      <div class="pricing-tier">Free</div>
+      <div class="pricing-price">₹0</div>
+      <div class="pricing-desc">To get a feel for the platform.</div>
+      <ul class="pricing-features">
+        <li>2 quizzes / day (Practice &amp; Consultant)</li>
+        <li>Basic difficulty only</li>
+        <li>Full T-code &amp; table reference</li>
+        <li>3 Technical + 3 Support answers / day</li>
+        <li>5 bookmarks</li>
+        <li class="off">AI Mock Interviews</li>
+        <li class="off">Unlimited quizzes</li>
+      </ul>
+      <a href="#cta" class="pricing-btn btn-outline">Get Started Free</a>
+    </div>
+    <div class="pricing-loading" id="pricingLoading">Loading live plan pricing…</div>
+  </div>
+</section>
+
+<!-- ─── CTA ───────────────────────────────────────────────────────────────── -->
+<section id="cta">
+  <div class="section-label" style="margin-bottom:16px;">Early Access</div>
+  <h2>Ready to stop reading about<br>SAP and start sounding like it?</h2>
+  <p>Join the waitlist. We'll let you know the moment your spot opens.</p>
+  <div class="cta-input-wrap">
+    <input class="cta-input" type="email" placeholder="your@email.com" id="ctaEmail">
+    <a href="#" class="btn-primary" style="white-space:nowrap;" onclick="handleSignup(event)">Get Access →</a>
+  </div>
+  <p class="cta-note">No spam. One email when we launch.</p>
+  <div style="margin-top:32px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+    <span class="mono" style="font-size:11px;font-weight:600;color:var(--purple-l);background:var(--purple-dim);border:1px solid rgba(124,58,237,0.3);padding:3px 10px;border-radius:5px;">1,300+ Questions</span>
+    <span class="mono" style="font-size:11px;font-weight:600;color:var(--purple-l);background:var(--purple-dim);border:1px solid rgba(124,58,237,0.3);padding:3px 10px;border-radius:5px;">AI Mock Interviews</span>
+    <span class="mono" style="font-size:11px;font-weight:600;color:var(--purple-l);background:var(--purple-dim);border:1px solid rgba(124,58,237,0.3);padding:3px 10px;border-radius:5px;">17 Core Topics</span>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="nav-logo" style="font-size:16px;">
+        <div class="nav-logo-icon" style="width:30px;height:30px;font-size:14px;">M</div>
+        ModuleMind
+      </div>
+      <p>AI-powered SAP FICO learning for the next generation of consultants. Study smarter. Speak confidently. Get interview-ready.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#modules">Module Coverage</a></li>
+          <li><a href="#interview-spotlight">Interview AI</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="#modules">Learning Roadmap</a></li>
+          <li><a href="#features">T-Code Library</a></li>
+          <li><a href="#features">Quiz Practice</a></li>
+          <li><a href="#interview-spotlight">Support Q&amp;A</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="/privacy-policy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms &amp; Conditions</a></li>
+          <li><a href="/terms#refunds">Refund Policy</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 <a href="/" style="color:inherit;">Skilltunes OPC Private Limited</a>. ModuleMind is a Skilltunes product.</span>
+    <span>Not affiliated with SAP SE. SAP® is a trademark of SAP SE.</span>
+  </div>
+</footer>
+
+<!-- ─── SCRIPTS ───────────────────────────────────────────────────────────── -->
+<script>
+  // ── Backend config ───────────────────────────────────────────────────────
+  // TODO: point this at the real production backend URL once a domain is live
+  // (see project note: CORS currently allows sapmaster.app, magic-link uses
+  // ficomaster.app — neither is a confirmed acquired domain yet). Until then
+  // this fetch fails silently and the static fallback plans below are shown.
+  const API_BASE_URL = 'https://sap-master-api.onrender.com';
+
+  // ── Nav scroll blur ──────────────────────────────────────────────────────
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // ── Scroll reveal ────────────────────────────────────────────────────────
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  revealEls.forEach(el => revealObs.observe(el));
+
+  // ── Mobile menu ──────────────────────────────────────────────────────────
+  function toggleMenu() {
+    const links = document.querySelector('.nav-links');
+    if (links) {
+      links.style.display = links.style.display === 'flex' ? 'none' : 'flex';
+      links.style.flexDirection = 'column';
+      links.style.position = 'absolute';
+      links.style.top = '64px';
+      links.style.left = '0';
+      links.style.right = '0';
+      links.style.background = 'var(--bg)';
+      links.style.padding = '20px';
+      links.style.borderBottom = '1px solid var(--border)';
+      links.style.zIndex = '99';
+    }
+  }
+
+  // ── Email sign-up handler ────────────────────────────────────────────────
+  function handleSignup(e) {
+    e.preventDefault();
+    const email = document.getElementById('ctaEmail').value;
+    if (!email || !email.includes('@')) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+    alert(`Thanks! We'll notify ${email} when early access opens.`);
+    document.getElementById('ctaEmail').value = '';
+  }
+
+  // ── Pricing: live fetch from GET /api/subscription-plans ────────────────
+  const DURATION_LABELS = { 7: 'Weekly', 30: 'Monthly', 90: '3 Months', 180: '6 Months', 365: 'Yearly' };
+  // Static fallback mirrors the real DB defaults (backend/routes/admin_routes.py)
+  // — used only if the live endpoint above is unreachable.
+  const FALLBACK_PLANS = [
+    { id: 'weekly',     name: 'Weekly',   duration_days: 7,   price_inr: 199,  original_price_inr: 199,  price_usd: 2.99,  original_price_usd: 2.99,  popular: false },
+    { id: 'monthly',    name: 'Monthly',  duration_days: 30,  price_inr: 499,  original_price_inr: 499,  price_usd: 5.99,  original_price_usd: 5.99,  popular: false },
+    { id: 'three_month',name: '3 Months', duration_days: 90,  price_inr: 1199, original_price_inr: 1497, price_usd: 14.99, original_price_usd: 17.97, popular: true  },
+    { id: 'six_month',  name: '6 Months', duration_days: 180, price_inr: 1799, original_price_inr: 2994, price_usd: 21.99, original_price_usd: 35.94, popular: false },
+  ];
+
+  let currentCurrency = 'INR';
+  let loadedPlans = null;
+
+  function detectDefaultCurrency() {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      const locale = navigator.language || '';
+      if (tz.includes('Kolkata') || tz.includes('Calcutta') || locale.toLowerCase().includes('-in')) return 'INR';
+    } catch (e) {}
+    return 'USD';
+  }
+
+  function fmtPrice(plan, currency) {
+    const price = currency === 'INR' ? plan.price_inr : plan.price_usd;
+    const original = currency === 'INR' ? plan.original_price_inr : plan.original_price_usd;
+    const symbol = currency === 'INR' ? '₹' : '$';
+    const label = DURATION_LABELS[plan.duration_days] || plan.name;
+    const period = plan.duration_days <= 7 ? '/wk' : plan.duration_days <= 31 ? '/mo' : plan.duration_days <= 92 ? '/3mo' : plan.duration_days <= 183 ? '/6mo' : '/yr';
+    return { price, original, symbol, label, period };
+  }
+
+  function renderPricingCards(plans, currency) {
+    const grid = document.getElementById('pricingGrid');
+    const loadingEl = document.getElementById('pricingLoading');
+    if (loadingEl) loadingEl.remove();
+    document.querySelectorAll('.pricing-card[data-plan]').forEach(el => el.remove());
+
+    plans.forEach(plan => {
+      const { price, original, symbol, label, period } = fmtPrice(plan, currency);
+      const card = document.createElement('div');
+      card.className = 'pricing-card reveal visible' + (plan.popular ? ' featured' : '');
+      card.setAttribute('data-plan', plan.id);
+      const strike = original && original > price
+        ? `<div class="pricing-strike">${symbol}${original}</div>` : '';
+      card.innerHTML = `
+        ${plan.popular ? '<div class="pricing-badge">Most Popular</div>' : ''}
+        <div class="pricing-tier">${label}</div>
+        ${strike}
+        <div class="pricing-price"><sup>${symbol}</sup>${price}<sub>${period}</sub></div>
+        <div class="pricing-desc">Full access, billed ${label.toLowerCase()}.</div>
+        <ul class="pricing-features">
+          <li>Unlimited quizzes, all difficulties</li>
+          <li>Unlimited Library (Technical + Support)</li>
+          <li>AI Mock Interviews — 20 Q/session, 10/day</li>
+          <li>Unlimited bookmarks</li>
+          <li>Full T-code &amp; table reference</li>
+        </ul>
+        <a href="#cta" class="pricing-btn ${plan.popular ? 'btn-filled' : 'btn-outline'}">Start ${label} Plan</a>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function setCurrency(cur) {
+    currentCurrency = cur;
+    document.getElementById('curBtnINR').classList.toggle('active', cur === 'INR');
+    document.getElementById('curBtnUSD').classList.toggle('active', cur === 'USD');
+    document.querySelector('.pricing-card .pricing-price').textContent = cur === 'INR' ? '₹0' : '$0';
+    if (loadedPlans) renderPricingCards(loadedPlans, cur);
+  }
+
+  document.getElementById('curBtnINR').addEventListener('click', () => setCurrency('INR'));
+  document.getElementById('curBtnUSD').addEventListener('click', () => setCurrency('USD'));
+
+  async function loadPricing() {
+    currentCurrency = detectDefaultCurrency();
+    setCurrency(currentCurrency);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/subscription-plans`, { signal: AbortSignal.timeout(5000) });
+      if (!res.ok) throw new Error('bad response');
+      const data = await res.json();
+      const plans = (data.plans || data || []).filter(p => p.is_active !== false && p.id !== 'free_trial');
+      loadedPlans = plans.length ? plans : FALLBACK_PLANS;
+    } catch (e) {
+      loadedPlans = FALLBACK_PLANS;
+    }
+    renderPricingCards(loadedPlans, currentCurrency);
+  }
+  loadPricing();
+
+  // ── Interview widget animation (illustrative demo, not a live connection) ─
+  const QUESTIONS = [
+    "Tell me about your SAP experience... and which area of FI do you find most challenging?",
+    "Got it... so when we talk about the posting period variant... what exactly controls which periods are open for posting in SAP?",
+    "Interesting... in Asset Accounting... can you walk me through the difference between acquisition cost and net book value?",
+    "Right... and in CO... if I ask you to explain cost center accounting versus profit center accounting... how would you distinguish the two?",
+  ];
+
+  const TRANSCRIPTS = [
+    "So I've been working mainly with the FI module, particularly General Ledger and Accounts Payable. I find Asset Accounting the most challenging because of the parallel ledger configuration...",
+    "The posting period variant is assigned to the company code, and it controls which fiscal year periods are open for posting. You configure it in transaction OB52 where you define the periods...",
+    "Acquisition cost is what you originally paid for the asset, while net book value is the acquisition cost minus the accumulated depreciation. In SAP you can see both in the asset explorer transaction AW01N...",
+    "Cost center accounting collects costs by department or functional area, so it tells you where costs occurred. Profit center accounting is about where profits are made, so it's more of a management reporting view...",
+  ];
+
+  const wStatus    = document.getElementById('wStatus');
+  const wStatusDot = document.getElementById('wStatusDot');
+  const wStatusTxt = document.getElementById('wStatusText');
+  const wOrb       = document.getElementById('wOrb');
+  const wWaves     = document.getElementById('wWaves');
+  const wQuestion  = document.getElementById('wQuestion');
+  const wTranscript  = document.getElementById('wTranscript');
+  const wTransTxt    = document.getElementById('wTranscriptText');
+  const wTimerWrap   = document.getElementById('wTimerWrap');
+  const wTimerFill   = document.getElementById('wTimerFill');
+  const wTimerSec    = document.getElementById('wTimerSec');
+
+  let qIdx = 0;
+  let timerVal = 0;
+  let timerInterval = null;
+
+  function setStatus(label, color) {
+    wStatusTxt.textContent = label;
+    wStatus.style.color = color;
+    wStatus.style.borderColor = color + '55';
+    wStatusDot.style.background = color;
+  }
+
+  function typeText(el, text, speed = 28) {
+    return new Promise(resolve => {
+      el.textContent = '';
+      let i = 0;
+      const t = setInterval(() => {
+        el.textContent += text[i++];
+        if (i >= text.length) { clearInterval(t); resolve(); }
+      }, speed);
+    });
+  }
+
+  async function runWidget() {
+    const q = QUESTIONS[qIdx % QUESTIONS.length];
+    const tr = TRANSCRIPTS[qIdx % TRANSCRIPTS.length];
+
+    // ── Phase 1: Speaking ───────────────────────────────────────────
+    wTranscript.style.display = 'none';
+    wTimerWrap.style.display = 'none';
+    wWaves.style.display = 'none';
+    wOrb.style.display = 'flex';
+    wOrb.textContent = '🔊';
+    wOrb.style.borderColor = 'var(--purple)';
+    wOrb.style.boxShadow = '0 0 24px var(--purple-glow)';
+    setStatus('Interviewer speaking...', 'var(--purple-l)');
+
+    await typeText(wQuestion, q, 22);
+    await sleep(900);
+
+    // ── Phase 2: Listening ──────────────────────────────────────────
+    wOrb.textContent = '🎙';
+    wOrb.style.borderColor = 'var(--green)';
+    wOrb.style.boxShadow = '0 0 24px rgba(16,185,129,0.3)';
+    wOrb.style.display = 'none';
+    wWaves.style.display = 'flex';
+    wTranscript.style.display = 'block';
+    wTransTxt.textContent = '';
+    wTimerWrap.style.display = 'block';
+    setStatus('Listening — answer now', 'var(--green)');
+
+    timerVal = 0;
+    wTimerFill.style.width = '0%';
+    timerInterval = setInterval(() => {
+      timerVal += 0.15;
+      const pct = Math.min((timerVal / 13) * 100, 100);
+      wTimerFill.style.width = pct + '%';
+      wTimerSec.textContent = `${timerVal.toFixed(0)}s / 10s min`;
+    }, 150);
+
+    await typeText(wTransTxt, tr, 14);
+    await sleep(1000);
+    clearInterval(timerInterval);
+
+    // ── Phase 3: Processing ─────────────────────────────────────────
+    wWaves.style.display = 'none';
+    wOrb.style.display = 'flex';
+    wOrb.textContent = '⏳';
+    wOrb.style.borderColor = 'var(--amber)';
+    wOrb.style.boxShadow = '0 0 24px rgba(245,158,11,0.2)';
+    setStatus('Scoring your answer...', 'var(--amber)');
+    await sleep(1600);
+
+    qIdx++;
+    await runWidget();
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // Start widget on load
+  runWidget();
+</script>
+</body>
+</html>
